@@ -64,25 +64,35 @@ int main() {
     
 }
 void fft(vector<cx>& a, vector<cx>& b, int i,int n,int n1,int n2){
-
-    for (int l = n1; l < n2; l += i) {
-        for (int k = 0; k < i / 2; k++) {
-            if (i == 2) {
-                //cout << bitReverse(l + k, n) << "  " << bitReverse(l + k + i / 2, n);
-                WW = exp(cx(-2) * cx(PI) * J * cx(k) / cx(i));
-                //cout << "value of W is : " << real(WW) << endl;
-                b[l + k] = a[bitReverse(l + k, n)] + a[bitReverse(l + k + i / 2, n)] * WW;
-                b[l + k + i / 2] = a[bitReverse(l + k, n)] - (a[bitReverse(l + k + i / 2, n)] * WW);
-            }
-            else {
-                //cout << bitReverse(l + k, n) << "  " << bitReverse(l + k + i / 2, n);
-                WW = exp(cx(-2) * cx(PI) * J * cx(k) / cx(i));
-                //cout << "value of W is : " << real(WW) << endl;
-                b[l + k] = a[l + k] + a[l + k + i / 2] * WW;
-                b[l + k + i / 2] = a[l + k] - (a[l + k + i / 2] * WW);
-            }
+    if (i == a.size() || i == a.size() / 2) {
+        int k = 0;
+        for (int l = n1; l < n2; l++) {
+            WW = exp(cx(-2) * cx(PI) * J * cx(k++) / cx(i));
+            //cout << "value of W is : " << real(WW) << endl;
+            b[l] = a[bitReverse(l , n)] + a[bitReverse(l + i / 2, n)] * WW;
+            b[l + i / 2] = a[bitReverse(l , n)] - (a[bitReverse(l + i / 2, n)] * WW);
         }
-        //cout << endl;
+    }
+    else {
+        for (int l = n1; l < n2; l += i) {
+            for (int k = 0; k < i / 2; k++) {
+                if (i == 2) {
+                    //cout << bitReverse(l + k, n) << "  " << bitReverse(l + k + i / 2, n);
+                    WW = exp(cx(-2) * cx(PI) * J * cx(k) / cx(i));
+                    //cout << "value of W is : " << real(WW) << endl;
+                    b[l + k] = a[bitReverse(l + k, n)] + a[bitReverse(l + k + i / 2, n)] * WW;
+                    b[l + k + i / 2] = a[bitReverse(l + k, n)] - (a[bitReverse(l + k + i / 2, n)] * WW);
+                }
+                else {
+                    //cout << bitReverse(l + k, n) << "  " << bitReverse(l + k + i / 2, n);
+                    WW = exp(cx(-2) * cx(PI) * J * cx(k) / cx(i));
+                    //cout << "value of W is : " << real(WW) << endl;
+                    b[l + k] = a[l + k] + a[l + k + i / 2] * WW;
+                    b[l + k + i / 2] = a[l + k] - (a[l + k + i / 2] * WW);
+                }
+            }
+            //cout << endl;
+        }
     }
     a = b;
     //cout << endl;
@@ -91,10 +101,16 @@ void fft(vector<cx>& a, vector<cx>& b, int i,int n,int n1,int n2){
 unsigned int bitReverse(unsigned int x, int size) {
     unsigned int y = 0;
     for (int i = 0; i < size; i++) {
-        y = (y << 1) | (x & 1);
-        x >>= 1;
+        unsigned int a = (x & 1);
+        //cout<<"Value of x is : "<<x<<endl;
+        y += a;
+        //cout<<"Value of y is : "<<y<<endl;
+        x = x >> 1;
+        //cout<<"Value of a is : "<<a<<endl;
+        y = y << 1;
+        //cout<<"Value of y is : "<<y<<endl;
     }
-    return y;
+    return y >>= 1;
 }
 
 void fft_recursive(vector<cx>& a) {
